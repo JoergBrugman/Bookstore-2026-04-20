@@ -95,6 +95,8 @@ page 50101 "Book List"
                     IsHandled: Boolean;
                 begin
                     OnBeforeProcessBook(Rec, IsHandled);
+                    if IsHandled then
+                        exit;
                     case Rec.Type of
                         "Book Type"::" ":
                             BookTypeProcess := BookTypeNoneImpl;
@@ -116,11 +118,7 @@ page 50101 "Book List"
                 trigger OnAction()
                 var
                     BookTypeProcess: Interface "Book Type Process";
-                    IsHandled: Boolean;
                 begin
-                    // OnBeforeProcessBook(Rec, IsHandled);
-                    // if IsHandled then
-                    //     exit;
                     BookTypeProcess := Rec.Type;
                     BookTypeProcess.StartDeployBook();
                     if BookTypeProcess is "Book Type Process V2" then
