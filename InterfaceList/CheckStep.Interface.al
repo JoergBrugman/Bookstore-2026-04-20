@@ -1,5 +1,14 @@
 namespace GetUse.Academy.Bookstore.InterfaceList;
 
+/// <summary>
+/// To register your Codeunit implemting this Interface, you have to use following Event-Subscriber:
+/// [EventSubscriber(ObjectType::Codeunit, Codeunit::"Check Pipeline", OnRegisterCheckSteps, '', false, false)]
+/// local procedure "Check Pipeline_OnRegisterCheckSteps"(var Steps: List of [Interface "Check Step"]; RecRef: RecordRef)
+/// begin
+///     if RecRef.Number = Database::"Your Table to check" then
+///         Steps.Add(this);
+/// end;
+/// </summary>
 interface "Check Step"
 {
     /// <summary>

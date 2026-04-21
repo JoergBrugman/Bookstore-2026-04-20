@@ -29,4 +29,12 @@ codeunit 50108 "Check Customer Foreign Bill" implements "Check Step"
         RecRef.SetTable(Customer);
         exit(Customer."Country/Region Code" <> '');
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Check Pipeline", OnRegisterCheckSteps, '', false, false)]
+    local procedure "Check Pipeline_OnRegisterCheckSteps"(Steps: List of [Interface "Check Step"]; RecRef: RecordRef)
+    begin
+        if RecRef.Number = Database::Customer then
+            Steps.Add(this);
+    end;
+
 }

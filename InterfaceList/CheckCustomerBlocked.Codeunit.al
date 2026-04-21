@@ -1,5 +1,6 @@
 namespace GetUse.Academy.Bookstore.InterfaceList;
 using Microsoft.Sales.Customer;
+using Microsoft.Sales.Pricing;
 
 codeunit 50107 "Check Customer Blocked" implements "Check Step"
 {
@@ -22,5 +23,12 @@ codeunit 50107 "Check Customer Blocked" implements "Check Step"
     procedure IsEnabled(RecRef: RecordRef): Boolean
     begin
         exit(true);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Check Pipeline", OnRegisterCheckSteps, '', false, false)]
+    local procedure "Check Pipeline_OnRegisterCheckSteps"(Steps: List of [Interface "Check Step"]; RecRef: RecordRef)
+    begin
+        if RecRef.Number = Database::Customer then
+            Steps.Add(this);
     end;
 }

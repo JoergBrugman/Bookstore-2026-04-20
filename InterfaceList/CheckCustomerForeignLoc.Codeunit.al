@@ -28,4 +28,11 @@ codeunit 50109 "Check Customer Foreign Loc" implements "Check Step"
         RecRef.SetTable(Customer);
         exit(Customer."Country/Region Code" <> '');
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Check Pipeline", OnRegisterCheckSteps, '', false, false)]
+    local procedure "Check Pipeline_OnRegisterCheckSteps"(Steps: List of [Interface "Check Step"]; RecRef: RecordRef)
+    begin
+        if RecRef.Number = Database::Customer then
+            Steps.Add(this);
+    end;
 }

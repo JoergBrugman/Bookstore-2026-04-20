@@ -1,5 +1,6 @@
 namespace GetUse.Academy.Bookstore.InterfaceList;
 using System.Reflection;
+using System.Utilities;
 
 codeunit 50106 "Check Pipeline"
 {
@@ -22,7 +23,8 @@ codeunit 50106 "Check Pipeline"
         TxtBuilder: TextBuilder;
     begin
         CollectSteps(Steps, RecRef);
-        SortSteps(Steps);
+        // SortSteps(Steps);
+        SortStepsBubbleSort(Steps);
 
         foreach Step in Steps do
             if Step.IsEnabled(RecRef) then begin
@@ -33,11 +35,61 @@ codeunit 50106 "Check Pipeline"
         Message(TxtBuilder.ToText());
     end;
 
-    local procedure CollectSteps(Steps: List of [Interface GetUse.Academy.Bookstore.InterfaceList."Check Step"]; RecRef: RecordRef)
+    local procedure CollectSteps(Steps: List of [Interface "Check Step"]; RecRef: RecordRef)
     begin
+        OnRegisterCheckSteps(Steps, RecRef);
     end;
 
-    local procedure SortSteps(Steps: List of [Interface GetUse.Academy.Bookstore.InterfaceList."Check Step"])
+    local procedure SortSteps(Steps: List of [Interface "Check Step"])
+    var
+        Integer: Record Integer;
+        Sorted: List of [Interface "Check Step"];
+        Step: Interface "Check Step";
+    begin
+        // Vorkommenden Sequences aus der Liste merken
+        foreach Step in Steps do begin
+            Integer.Get(Step.GetSequence());
+            Integer.Mark(true);
+        end;
+        // Auf die markierten Intergers filtern
+        Integer.MarkedOnly(true);
+
+        // Die Sequences nacheinander durchgehen
+        if Integer.FindSet() then
+            repeat
+                //Jetzt die Interfaces, die zu einer Sequence gehören, nacheinader übertragen
+                foreach Step in Steps do
+                    if Step.GetSequence() = Integer.Number then
+                        Sorted.Add(Step);
+            until Integer.Next() = 0;
+        Steps := Sorted;
+    end;
+
+    local procedure SortStepsBubbleSort(var Steps: List of [Interface "Check Step"])
+    var
+        Temp: Interface "Check Step";
+        I, J : Integer;
+        Swapped: Boolean;
+    begin
+        if Steps.Count() <= 1 then
+            exit;
+
+        for I := 1 to Steps.Count() - 1 do begin
+            Swapped := false;
+            for J := 1 to Steps.Count() - I do
+                if Steps.Get(J).GetSequence() > Steps.Get(J + 1).GetSequence() then begin
+                    Temp := Steps.Get(J);
+                    Steps.Set(J, Steps.Get(J + 1));
+                    Steps.Set(J + 1, Temp);
+                    Swapped := true;
+                end;
+            if not Swapped then
+                break;
+        end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRegisterCheckSteps(Steps: List of [Interface "Check Step"]; RecRef: RecordRef)
     begin
     end;
 }
